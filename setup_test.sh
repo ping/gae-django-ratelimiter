@@ -4,7 +4,7 @@ set -e
 
 # Source: https://blog.bekt.net/p/gae-sdk/
 API_CHECK='https://appengine.google.com/api/updatecheck'
-SDK_VERSION=$(curl -s $API_CHECK | awk -F '\"' '/release/ {print $2}')
+SDK_VERSION=$(curl --retry 2 -s $API_CHECK | awk -F '\"' '/release/ {print $2}')
 # Remove the dots.
 SDK_VERSION_S="${SDK_VERSION//./}"
 
@@ -15,8 +15,8 @@ SDK_URL_B="${SDK_URL}deprecated/$SDK_VERSION_S/google_appengine_${SDK_VERSION}.z
 function download_sdk {
     echo ">>> Downloading... GAE ver $SDK_VERSION"
     mkdir -p gae_sdk
-    curl -L -s --fail -o "gae.zip" "$SDK_URL_A" || \
-        curl -L --fail -s -o "gae.zip" "$SDK_URL_B" || \
+    curl -L --retry 2 -s --fail -o "gae.zip" "$SDK_URL_A" || \
+        curl -L --retry 2 --fail -s -o "gae.zip" "$SDK_URL_B" || \
         exit 1
     unzip -qd gae_sdk "gae.zip" && rm gae.zip
 }
