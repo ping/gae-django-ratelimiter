@@ -4,6 +4,9 @@ A basic Django request rate limiter (X requests per Y minutes) for use on Google
 
 Just Good Enough™ for weekend projects.
 
+[![Build](https://img.shields.io/travis/ping/gae-django-ratelimiter.svg)](https://travis-ci.org/ping/gae-django-ratelimiter)
+[![Coverage](https://img.shields.io/coveralls/ping/gae-django-ratelimiter.svg)](https://coveralls.io/github/ping/gae-django-ratelimiter)
+
 ## Features
 
 1. Available as middleware ``gae_django_ratelimiter.RateLimiterMiddleware`` or request decorator ``@ratelimit``
