@@ -1,0 +1,24 @@
+language: python
+
+python:
+  - "2.7"
+
+env:
+  - DJANGO_VER="1.9"
+  - DJANGO_VER="1.11"
+
+install:
+  - bash setup_test.sh
+  - pip install django==$DJANGO_VER -q
+  - pip install -r requirements-dev.txt -q
+
+script:
+  - flake8 gae_django_ratelimiter tests
+  - coverage run --omit=*/__init__.py --source=gae_django_ratelimiter -m unittest discover tests -v
+
+after_success:
+  - coveralls
+
+branches:
+  only:
+    - master
