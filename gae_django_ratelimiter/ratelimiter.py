@@ -1,4 +1,5 @@
 
+import logging
 import functools
 from hashlib import md5
 import re
@@ -13,6 +14,8 @@ from .settings import (
     RATELIMITER_INCLUDE_URL_NAMES, RATELIMITER_EXCLUDE_URL_NAMES,
     RATELIMITER_EXCLUDE_AUTHENTICATED, RATELIMITER_EXCLUDE_ADMINS,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class HttpResponseThrottled(HttpResponse):
@@ -102,17 +105,24 @@ class RateLimiter(object):
             return False
 
         if self.exclude_admins:
-            # Django admin
-            if request.user.is_authenticated and (
-                    request.user.is_staff or request.user.is_superuser):
-                return False
-            # GAE admin
-            if users.get_current_user() and users.is_current_user_admin():
-                return False
+            try:
+                # Django admin
+                if request.user.is_authenticated and (
+                        request.user.is_staff or request.user.is_superuser):
+                    return False
+                # GAE admin
+                if users.get_current_user() and users.is_current_user_admin():
+                    return False
+            except AttributeError as ae:
+                logger.warning(ae.message)
 
-        if self.exclude_authenticated and (
-                request.user.is_authenticated() or users.get_current_user()):
-            return False
+        try:
+            if self.exclude_authenticated and (
+                    request.user.is_authenticated() or
+                    users.get_current_user()):
+                return False
+        except AttributeError as ae:
+            logger.warning(ae.message)
 
         if self.exclude_url_names:
             for url_name in self.exclude_url_names:
